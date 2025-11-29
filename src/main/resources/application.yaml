@@ -1,3 +1,14 @@
 spring:
   application:
     name: isko-d
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/iskodb
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
