@@ -2,9 +2,8 @@ package com.isko_d.isko_d.service;
 
 import com.isko_d.isko_d.model.Log;
 import com.isko_d.isko_d.repository.LogRepository;
+import com.isko_d.isko_d.exception.NotFoundException;
 import org.springframework.stereotype.Service;
-import java.lang.RuntimeException;
-import java.lang.Integer;
 import java.util.List;
 
 @Service
@@ -21,7 +20,7 @@ public class LogService {
 
     public Log findById(Integer id) {
         return logRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Log not found."));
+            .orElseThrow(() -> new NotFoundException(Log.class, id));
     }
 
     public Log save(Log log) {
@@ -30,7 +29,7 @@ public class LogService {
 
     public Log update(Integer id, Log log) {
         Log existingLog = logRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Log not found."));
+                .orElseThrow(() -> new NotFoundException(Log.class, id));
 
         existingLog.setActionType(log.getActionType());
         existingLog.setLocation(log.getLocation());
@@ -41,7 +40,7 @@ public class LogService {
 
     public Log delete(Integer id) {
         Log log = logRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Log not found."));
+            .orElseThrow(() -> new NotFoundException(Log.class, id));
 
         logRepository.deleteById(id);
 
