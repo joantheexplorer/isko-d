@@ -31,9 +31,9 @@ public class LogService {
         Log existingLog = logRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Log.class, id));
 
-        existingLog.setActionType(log.getActionType());
-        existingLog.setLocation(log.getLocation());
-        existingLog.setDeviceId(log.getDeviceId());
+        if (log.getActionType() != null && !log.getActionType().isBlank()) existingLog.setActionType(log.getActionType());
+        if (log.getLocation() != null && !log.getLocation().isBlank()) existingLog.setLocation(log.getLocation());
+        if (log.getDeviceId() != null && !log.getDeviceId().isBlank()) existingLog.setDeviceId(log.getDeviceId());
 
         return logRepository.save(existingLog);
     }
