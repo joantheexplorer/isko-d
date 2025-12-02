@@ -2,7 +2,8 @@ package com.isko_d.isko_d.controller;
 
 import com.isko_d.isko_d.model.Log;
 import com.isko_d.isko_d.service.LogService;
-import com.isko_d.isko_d.dto.LogDto;
+import com.isko_d.isko_d.dto.LogRequestDTO;
+import com.isko_d.isko_d.dto.LogResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +26,8 @@ public class LogController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Log>> getAllLogs() {
-        List<Log> logs = logService.findAll();
+    public ResponseEntity<List<LogResponseDTO>> getAllLogs() {
+        List<LogResponseDTO> logs = logService.findAll();
 
         if (logs.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -36,23 +37,23 @@ public class LogController {
     }
 
     @GetMapping(path="/{id}")
-    public ResponseEntity<Log> getLog(@PathVariable Integer id) {
+    public ResponseEntity<LogResponseDTO> getLog(@PathVariable Long id) {
         return ResponseEntity.ok(logService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Log> createLog(@RequestBody @Valid Log log) {
-        Log savedLog = logService.save(log);
+    public ResponseEntity<LogResponseDTO> createLog(@RequestBody @Valid LogRequestDTO request) {
+        LogResponseDTO savedLog = logService.save(request);
         return ResponseEntity.status(201).body(savedLog);
     }
 
     @PatchMapping(path="/{id}")
-    public ResponseEntity<Log> updateLog(@PathVariable Integer id, @RequestBody LogDto dto) {
-        return ResponseEntity.ok(logService.update(id, dto));
+    public ResponseEntity<LogResponseDTO> updateLog(@PathVariable Long id, @RequestBody LogRequestDTO request) {
+        return ResponseEntity.ok(logService.update(id, request));
     }
 
     @DeleteMapping(path="/{id}")
-    public ResponseEntity<Log> delete(@PathVariable Integer id) {
+    public ResponseEntity<LogResponseDTO> delete(@PathVariable Long id) {
         return ResponseEntity.ok(logService.delete(id));
     }
 }

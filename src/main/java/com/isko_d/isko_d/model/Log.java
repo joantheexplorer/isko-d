@@ -19,15 +19,8 @@ public class Log {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    // TODO: Add foreign key to user when available
-
-    @NotBlank
     private String actionType;
-
-    // TODO: Add a locations table for scalability
     private String location;
-
-    @NotBlank
     private String deviceId;
 
     @CreatedDate
@@ -37,8 +30,17 @@ public class Log {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    public Log(
+        String actionType,
+        String location,
+        String deviceId
+    ) {
+        this.actionType = actionType;
+        this.location = location;
+        this.deviceId = deviceId;
+    }
+
     public Long getId() { return id; }
-    // TODO: Add user_id getter once established
     public String getActionType() { return actionType; }
     public String getLocation() { return location; }
     public String getDeviceId() { return deviceId; }
@@ -46,7 +48,6 @@ public class Log {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
     public void setId(Long id) { this.id = id; }
-    // TODO: Add user_id setter once established
     public void setActionType(String actionType) { this.actionType = actionType; }
     public void setLocation(String location) { this.location = location; }
     public void setDeviceId(String deviceId) { this.deviceId = deviceId; }

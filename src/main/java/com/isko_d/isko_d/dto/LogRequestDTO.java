@@ -1,6 +1,6 @@
 package com.isko_d.isko_d.dto;
 
-public class LogDto {
+public class LogRequestDTO {
     private String actionType;
     private String location;
     private String deviceId;

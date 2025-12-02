@@ -1,7 +1,8 @@
 package com.isko_d.isko_d.service;
 
 import com.isko_d.isko_d.model.Log;
-import com.isko_d.isko_d.dto.LogDto;
+import com.isko_d.isko_d.dto.LogRequestDTO;
+import com.isko_d.isko_d.dto.LogResponseDTO;
 import com.isko_d.isko_d.repository.LogRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,36 +16,48 @@ public class LogService {
         this.logRepository = logRepository;
     }
 
-    public List<Log> findAll() {
-        return logRepository.findAll();
+    public List<LogResponseDTO> findAll() {
+        return logRepository.findAll()
+            .stream()
+            .map((log) -> new LogResponseDTO(log))
+            .toList();
     }
 
-    public Log findById(Long id) {
+    public LogResponseDTO findById(Long id) {
         return logRepository.findById(id)
+            .map((log) -> new LogResponseDTO(log))
             .orElseThrow(() -> new NotFoundException(Log.class, id));
     }
 
-    public Log save(Log log) {
-        return logRepository.save(log);
+    public LogResponseDTO save(LogRequestDTO request) {
+        Log saved = logRepository.save(new Log(
+            request.getActionType(),
+            request.getLocation(),
+            request.getDeviceId()
+        ));
+
+        return new LogResponseDTO(saved);
     }
 
-    public Log update(Long id, LogDto dto) {
-        Log existingLog = logRepository.findById(id)
+    public LogResponseDTO update(Long id, LogRequestDTO request) {
+        Log existing = logRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Log.class, id));
 
-        if (dto.getActionType() != null && !dto.getActionType().isBlank()) existingLog.setActionType(dto.getActionType());
-        if (dto.getLocation() != null && !dto.getLocation().isBlank()) existingLog.setLocation(dto.getLocation());
-        if (dto.getDeviceId() != null && !dto.getDeviceId().isBlank()) existingLog.setDeviceId(dto.getDeviceId());
+        if (request.getActionType() != null && !request.getActionType().isBlank()) existing.setActionType(request.getActionType());
+        if (request.getLocation() != null && !request.getLocation().isBlank()) existing.setLocation(request.getLocation());
+        if (request.getDeviceId() != null && !request.getDeviceId().isBlank()) existing.setDeviceId(request.getDeviceId());
 
-        return logRepository.save(existingLog);
+        Log saved = logRepository.save(existing);
+
+        return new LogResponseDTO(saved);
     }
 
-    public Log delete(Long id) {
+    public LogResponseDTO delete(Long id) {
         Log log = logRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(Log.class, id));
 
         logRepository.deleteById(id);
 
-        return log;
+        return new LogResponseDTO(log);
     }
 }
