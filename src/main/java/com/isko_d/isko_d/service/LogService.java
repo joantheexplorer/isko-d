@@ -1,8 +1,8 @@
 package com.isko_d.isko_d.service;
 
 import com.isko_d.isko_d.model.Log;
-import com.isko_d.isko_d.dto.LogRequestDTO;
-import com.isko_d.isko_d.dto.LogResponseDTO;
+import com.isko_d.isko_d.dto.log.LogRequestDTO;
+import com.isko_d.isko_d.dto.log.LogResponseDTO;
 import com.isko_d.isko_d.repository.LogRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
 import org.springframework.stereotype.Service;

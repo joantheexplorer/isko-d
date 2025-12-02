@@ -1,4 +1,4 @@
-package com.isko_d.isko_d.dto;
+package com.isko_d.isko_d.dto.log;
 
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;

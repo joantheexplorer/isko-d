@@ -1,6 +1,6 @@
 package com.isko_d.isko_d.exception;
 
-import com.isko_d.isko_d.dto.*;
+import com.isko_d.isko_d.dto.error.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

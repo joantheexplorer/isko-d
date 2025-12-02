@@ -1,4 +1,4 @@
-package com.isko_d.isko_d.dto;
+package com.isko_d.isko_d.dto.error;
 
 import java.util.Map;
 import java.time.Instant;

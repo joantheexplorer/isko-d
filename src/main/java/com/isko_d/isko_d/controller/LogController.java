@@ -2,8 +2,8 @@ package com.isko_d.isko_d.controller;
 
 import com.isko_d.isko_d.model.Log;
 import com.isko_d.isko_d.service.LogService;
-import com.isko_d.isko_d.dto.LogRequestDTO;
-import com.isko_d.isko_d.dto.LogResponseDTO;
+import com.isko_d.isko_d.dto.log.LogRequestDTO;
+import com.isko_d.isko_d.dto.log.LogResponseDTO;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
 import org.springframework.http.ResponseEntity;
