@@ -28,7 +28,7 @@ public class LogController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LogResponseDTO>> getAllLogs() {
+    public ResponseEntity<List<LogResponseDTO>> findAll() {
         List<LogResponseDTO> logs = logService.findAll();
 
         if (logs.isEmpty()) {
@@ -39,12 +39,12 @@ public class LogController {
     }
 
     @GetMapping(path="/{id}")
-    public ResponseEntity<LogResponseDTO> getLog(@PathVariable Long id) {
+    public ResponseEntity<LogResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(logService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<LogResponseDTO> createLog(
+    public ResponseEntity<LogResponseDTO> save(
         @RequestBody @Validated(Create.class) LogRequestDTO request
     ) {
         LogResponseDTO savedLog = logService.save(request);
@@ -52,7 +52,7 @@ public class LogController {
     }
 
     @PatchMapping(path="/{id}")
-    public ResponseEntity<LogResponseDTO> updateLog(
+    public ResponseEntity<LogResponseDTO> update(
         @PathVariable Long id,
         @RequestBody @Validated(Update.class) LogRequestDTO request
     ) {
