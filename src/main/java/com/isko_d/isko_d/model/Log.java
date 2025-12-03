@@ -30,6 +30,8 @@ public class Log {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    public Log() {}
+
     public Log(
         String actionType,
         String location,
