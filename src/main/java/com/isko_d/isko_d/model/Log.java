@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name="logs")
 @EntityListeners(AuditingEntityListener.class)
 public class Log {
     @Id 
