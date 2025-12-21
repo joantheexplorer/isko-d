@@ -4,6 +4,8 @@ import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
+
+import java.util.HashSet;
 import java.util.Set;
 
 public class UserRequestDTO {
@@ -23,7 +25,7 @@ public class UserRequestDTO {
     @NotBlank(groups=Create.class)
     private String password;
 
-    private Set<Long> roles;
+    private Set<Long> roles = new HashSet<>();
 
     public String getFirstName() { return firstName; }
     public String getMiddleName() { return middleName; }

@@ -6,6 +6,8 @@ import com.isko_d.isko_d.dto.user.UserResponseDTO;
 import com.isko_d.isko_d.repository.UserRepository;
 import com.isko_d.isko_d.repository.RoleRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -13,10 +15,17 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TokenService tokenService;
+    private final BCryptPasswordEncoder bCryptEncoder = new BCryptPasswordEncoder(10);
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserService(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            TokenService tokenService
+    ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.tokenService = tokenService;
     }
 
     public List<UserResponseDTO> findAll() {
@@ -44,14 +53,14 @@ public class UserService {
                 request.getMiddleName(),
                 request.getLastName(),
                 request.getEmail(),
-                request.getPassword()
+                bCryptEncoder.encode(request.getPassword())
         );
 
         request.getRoles().forEach(roleId -> {
             roleRepository.findById(roleId).ifPresent(role -> saved.getRoles().add(role));
         });
 
-        return new UserResponseDTO(saved);
+        return new UserResponseDTO(userRepository.save(saved));
     }
 
     public UserResponseDTO update(Long id, UserRequestDTO request) {
@@ -82,5 +91,16 @@ public class UserService {
         userRepository.deleteById(id);
 
         return new UserResponseDTO(deleted);
+    }
+
+    public String authenticate(String email, String password) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(User.class, email, "email"));
+
+        if (bCryptEncoder.matches(password, user.getPassword())) {
+            return tokenService.createToken(user);
+        }
+
+        return null;
     }
 }

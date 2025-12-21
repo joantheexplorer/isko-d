@@ -2,6 +2,7 @@ package com.isko_d.isko_d.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,7 +44,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name="user_roles",
         joinColumns=@JoinColumn(name="user_id"),
