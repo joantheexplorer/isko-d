@@ -1,13 +1,13 @@
 package com.isko_d.isko_d.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name="devices")
 @EntityListeners(AuditingEntityListener.class)
 public class Device {
 
@@ -29,8 +29,7 @@ public class Device {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @CreatedDate
-    @Column(updatable = false)
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     public Device() {}

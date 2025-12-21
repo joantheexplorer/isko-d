@@ -5,6 +5,8 @@ import com.isko_d.isko_d.repository.DepartmentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +14,8 @@ import java.util.List;
 public class DepartmentSeeder {
 
     @Bean
+    @Transactional
+    @Order(3)
     CommandLineRunner seedDepartments(DepartmentRepository repository) {
         return args -> {
             // Only seed if the table is empty to avoid duplicates

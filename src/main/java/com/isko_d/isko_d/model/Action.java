@@ -6,13 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name="actions")
 @EntityListeners(AuditingEntityListener.class)
 public class Action {
 
@@ -20,7 +21,7 @@ public class Action {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false)
     private String name;
 
     @CreatedDate

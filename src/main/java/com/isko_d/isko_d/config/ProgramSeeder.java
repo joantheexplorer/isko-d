@@ -7,6 +7,8 @@ import com.isko_d.isko_d.repository.ProgramRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
 public class ProgramSeeder {
 
     @Bean
+    @Transactional
+    @Order(4)
     CommandLineRunner seedPrograms(ProgramRepository programRepo, DepartmentRepository deptRepo) {
         return args -> {
             if (programRepo.count() == 0) {
