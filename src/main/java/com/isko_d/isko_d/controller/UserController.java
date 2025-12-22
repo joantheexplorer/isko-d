@@ -7,6 +7,7 @@ import com.isko_d.isko_d.dto.user.UserRequestDTO;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +44,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(id));
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
     @PostMapping
     public ResponseEntity<UserResponseDTO> save(
             @RequestBody @Validated(Create.class) UserRequestDTO request

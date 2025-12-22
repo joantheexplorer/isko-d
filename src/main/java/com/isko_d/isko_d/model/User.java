@@ -30,6 +30,9 @@ public class User {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    @Column(unique = true)
+    private String barcode;
+
     @Column(nullable = false)
     private String firstName;
 
@@ -63,12 +66,14 @@ public class User {
     public User() {}
 
     public User(
+        String barcode,
         String firstName,
         String middleName,
         String lastName,
         String email,
         String password
     ) { 
+        this.barcode = barcode;
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -77,6 +82,7 @@ public class User {
     }
 
     public Long getId() { return id; }
+    public String getBarcode() { return barcode; }
     public String getFirstName() { return firstName; }
     public String getMiddleName() { return middleName; }
     public String getLastName() { return lastName; }
@@ -87,6 +93,7 @@ public class User {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
     public void setId(Long id) { this.id = id; }
+    public void setBarcode(String barcode) { this.barcode = barcode; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setMiddleName(String middleName) { this.middleName = middleName; }
     public void setLastName(String lastName) { this.lastName = lastName; }

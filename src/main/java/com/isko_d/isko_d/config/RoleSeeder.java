@@ -21,9 +21,10 @@ public class RoleSeeder {
             // Only seed if the table is empty to avoid duplicates
             if (repository.count() == 0) {
                 List<Role> roles = List.of(
-                    new Role("superadmin"),
-                    new Role("admin"),
-                    new Role("student")
+                    new Role("SUPERADMIN"),
+                    new Role("ADMIN"),
+                    new Role("PROFESSOR"),
+                    new Role("STUDENT")
                 );
 
                 repository.saveAll(roles);

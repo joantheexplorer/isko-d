@@ -44,12 +44,20 @@ public class TokenService {
     public Token validateToken(String plainToken) {
         String lookup = hasher.sha256(plainToken);
         Token token = tokenRepository.findByTokenLookup(lookup);
-        System.out.println(hasher.matches(plainToken, token.getTokenHash()));
         if (token != null 
             && token.getExpiresAt().isAfter(LocalDateTime.now())
             && hasher.matches(plainToken, token.getTokenHash())) {
             return token;
         }
         return null;
+    }
+
+    public Token revokeToken(String plainToken) {
+        String lookup = hasher.sha256(plainToken);
+        Token token = tokenRepository.findByTokenLookup(lookup);
+        
+        tokenRepository.delete(token);
+
+        return token;
     }
 }

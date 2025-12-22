@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class UserResponseDTO {
     private Long id;
+    private String barcode;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -17,6 +18,7 @@ public class UserResponseDTO {
 
     public UserResponseDTO(User user) {
         this.id = user.getId();
+        this.barcode = user.getBarcode();
         this.firstName = user.getFirstName();
         this.middleName = user.getMiddleName();
         this.lastName = user.getLastName();
@@ -26,6 +28,7 @@ public class UserResponseDTO {
     }
 
     public Long getId() { return id; }
+    public String getBarcode() { return barcode; }
     public String getFirstName() { return firstName; }
     public String getMiddleName() { return middleName; }
     public String getLastName() { return lastName; }

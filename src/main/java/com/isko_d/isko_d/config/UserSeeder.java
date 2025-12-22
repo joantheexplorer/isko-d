@@ -24,8 +24,8 @@ public class UserSeeder {
         return args -> {
             // Only seed if the table is empty to avoid duplicates
             if (userRepository.count() == 0) {
-                Role superAdminRole = roleRepository.findByName("superadmin")
-                                        .orElseThrow(() -> new NotFoundException(Role.class, "superadmin", "name"));
+                Role superAdminRole = roleRepository.findByName("SUPERADMIN")
+                                        .orElseThrow(() -> new NotFoundException(Role.class, "SUPERADMIN", "name"));
                 
                 UserRequestDTO userInfo = new UserRequestDTO();
                 userInfo.setEmail("superadmin@iskod.com");

@@ -3,23 +3,26 @@ package com.isko_d.isko_d.controller;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.isko_d.isko_d.dto.login.LoginRequestDTO;
+import com.isko_d.isko_d.dto.login.LoginResponseDTO;
+import com.isko_d.isko_d.dto.user.StudentRequestDTO;
 import com.isko_d.isko_d.dto.user.UserRequestDTO;
 import com.isko_d.isko_d.dto.user.UserResponseDTO;
-import com.isko_d.isko_d.model.User;
 import com.isko_d.isko_d.service.TokenService;
 import com.isko_d.isko_d.service.UserService;
+import com.isko_d.isko_d.validation.Create;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     private final UserService userService;
     private final TokenService tokenService;
-    private final BCryptPasswordEncoder bCryptEncoder = new BCryptPasswordEncoder(10);
 
     public AuthController(
             UserService userService,
@@ -30,12 +33,30 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody UserRequestDTO request) {
-        String plainToken = userService.authenticate(request.getEmail(), request.getPassword());
-        if (plainToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials!");
+    public ResponseEntity<LoginResponseDTO> authenticateUser(@RequestBody @Validated(Create.class) LoginRequestDTO request) {
+        LoginResponseDTO authPayload = userService.authenticateAdmin(request.getEmail(), request.getPassword());
+        if (authPayload == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
-            return ResponseEntity.ok(plainToken);
+            return ResponseEntity.ok(authPayload);
         }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> registerStudent(@RequestBody @Validated(Create.class) StudentRequestDTO request) {
+        UserResponseDTO student = userService.registerStudent(request);
+        return ResponseEntity.status(201).body(student);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> revokeToken(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String plainToken = authHeader.substring(7);
+        tokenService.revokeToken(plainToken);
+
+        return ResponseEntity.noContent().build();
     }
 }

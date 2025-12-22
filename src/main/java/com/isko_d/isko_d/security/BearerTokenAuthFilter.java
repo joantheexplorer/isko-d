@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.isko_d.isko_d.exception.UnauthorizedException;
 import com.isko_d.isko_d.model.Token;
 import com.isko_d.isko_d.model.User;
 import com.isko_d.isko_d.service.TokenService;
@@ -42,6 +43,9 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String plainToken = authHeader.substring(7);
             token = tokenService.validateToken(plainToken);
+        } else {
+            filterChain.doFilter(request, response);
+            return;
         }
 
         if (token != null) {
@@ -60,6 +64,8 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
 
             Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
+        } else {
+            throw new UnauthorizedException("Invalid or expired API token");
         }
 
         filterChain.doFilter(request, response);

@@ -1,11 +1,16 @@
 package com.isko_d.isko_d.service;
 
+import com.isko_d.isko_d.model.Role;
 import com.isko_d.isko_d.model.User;
+import com.isko_d.isko_d.dto.error.UnauthorizedResponse;
+import com.isko_d.isko_d.dto.login.LoginResponseDTO;
+import com.isko_d.isko_d.dto.user.StudentRequestDTO;
 import com.isko_d.isko_d.dto.user.UserRequestDTO;
 import com.isko_d.isko_d.dto.user.UserResponseDTO;
 import com.isko_d.isko_d.repository.UserRepository;
 import com.isko_d.isko_d.repository.RoleRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
+import com.isko_d.isko_d.exception.UnauthorizedException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,6 +54,7 @@ public class UserService {
 
     public UserResponseDTO save(UserRequestDTO request) {
         User saved = new User(
+                request.getBarcode(),
                 request.getFirstName(),
                 request.getMiddleName(),
                 request.getLastName(),
@@ -93,14 +99,36 @@ public class UserService {
         return new UserResponseDTO(deleted);
     }
 
-    public String authenticate(String email, String password) {
+    public LoginResponseDTO authenticateAdmin(String email, String password) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(User.class, email, "email"));
+            .orElseThrow(() -> new UnauthorizedException("Incorrect credentials"));
 
-        if (bCryptEncoder.matches(password, user.getPassword())) {
-            return tokenService.createToken(user);
+        boolean isAdmin = user.getRoles().stream()
+            .map(Role::getName)
+            .anyMatch(name -> "ADMIN".equals(name) || "SUPERADMIN".equals(name));
+
+        if (isAdmin && bCryptEncoder.matches(password, user.getPassword())) {
+            return new LoginResponseDTO(user, tokenService.createToken(user));
+        } else {
+            throw new UnauthorizedException("Incorrect credentials");
         }
+    }
 
-        return null;
+    public UserResponseDTO registerStudent(StudentRequestDTO request) {
+        User saved = new User(
+                request.getBarcode(),
+                request.getFirstName(),
+                request.getMiddleName(),
+                request.getLastName(),
+                request.getEmail(),
+                bCryptEncoder.encode(request.getPassword())
+        );
+
+        Role studentRole = roleRepository.findByName("STUDENT")
+            .orElseThrow(() -> new NotFoundException(Role.class, "STUDENT", "name"));
+
+        saved.getRoles().add(studentRole);
+
+        return new UserResponseDTO(userRepository.save(saved));
     }
 }
