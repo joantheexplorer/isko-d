@@ -2,6 +2,8 @@ package com.isko_d.isko_d.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +40,17 @@ public class AuthController {
         if (authPayload == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
-            return ResponseEntity.ok(authPayload);
+            ResponseCookie cookie = ResponseCookie.from("api_token", authPayload.getPlainToken())
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(60 * 60 * 3)
+                .build();
+
+            return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(authPayload);
         }
     }
 
@@ -57,6 +69,16 @@ public class AuthController {
         String plainToken = authHeader.substring(7);
         tokenService.revokeToken(plainToken);
 
-        return ResponseEntity.noContent().build();
+        ResponseCookie cookie = ResponseCookie.from("api_token", "")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Lax")
+            .path("/")
+            .maxAge(0)
+            .build();
+
+        return ResponseEntity.noContent()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .build();
     }
 }
