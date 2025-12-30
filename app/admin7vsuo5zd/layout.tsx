@@ -1,4 +1,6 @@
 import LogoutButton from "@/src/components/forms/LogoutButton";
+import Sidebar from "@/src/components/Sidebar";
+import { ResourceContextProvider } from "@/src/contexts/ResourceContext";
 import { ApiError } from "@/src/types/ApiError";
 import apiFetch from "@/src/utils/apiFetch";
 import { cookies } from "next/headers";
@@ -27,24 +29,13 @@ const AdminLayout = async ({ children }: { children: ReactNode }) => {
 
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="hidden md:flex md:flex-col w-64 text-white">
-          <nav className="flex-1 p-4 space-y-2 bg-red-800">
-            <Link href="/admin7vsuo5zd" className="block px-4 py-2 rounded hover:bg-red-700">
-              Dashboard
-            </Link>
-            <Link href="/admin7vsuo5zd/users" className="block px-4 py-2 rounded hover:bg-red-700">
-              Users
-            </Link>
-            <Link href="/admin7vsuo5zd/logs" className="block px-4 py-2 rounded hover:bg-red-700">
-              Logs
-            </Link>
-            <Link href="/admin7vsuo5zd/settings" className="block px-4 py-2 rounded hover:bg-red-700">
-              Settings
-            </Link>
-          </nav>
-        </aside>
+        <Sidebar />
 
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-6 overflow-auto">
+          <ResourceContextProvider>
+            {children}
+          </ResourceContextProvider>
+        </main>
       </div>
     </div>
   );

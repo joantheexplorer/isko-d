@@ -8,7 +8,7 @@ const LogoutButton = () => {
 
   const handleLogout = async () => {
     try {
-      await apiFetch("auth/logout", { method: "POST" });
+      apiFetch("auth/logout", { method: "POST" });
       router.push("/admin7vsuo5zd/login");
     } catch (error) {
       console.error(error);
