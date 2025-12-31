@@ -11,6 +11,8 @@ export type ResourceContextType = {
   listData: Record<string, any>[];
   selectedData: Record<string, any>;
 
+  mode: "EDIT" | "CREATE" | "VIEW" | "";
+
   isListDataLoading: boolean;
   isSelectedDataLoading: boolean;
   isModalOpen: boolean;
@@ -24,6 +26,7 @@ export type ResourceContextType = {
   fetchList: () => void;
   loadResource: (res: string) => void;
 
+  submitItem: (data: Record<string, any>) => Promise<void>;
   deleteItem: (id: number) => Promise<void>;
 };
 
@@ -37,6 +40,7 @@ export const useResourceContext = () => {
 
 export const ResourceContextProvider = ({ children }: { children: ReactNode }) => {
   const [resource, setResource] = useState<string>("");
+  const [mode, setMode] = useState<"EDIT" | "CREATE" | "VIEW" | "">("");
   const [listParams, setListParams] = useState<Record<string, any>>({});
   const [selectedParams, setSelectedParams] = useState<Record<string, any>>({});
 
@@ -50,6 +54,7 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
 
   const openCreate = () => {
     setSelectedData({});
+    setMode("CREATE");
     setIsFormDisabled(false);
     setIsModalOpen(true);
   }
@@ -57,6 +62,7 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
   const openEdit = (item: Record<string, any>) => {
     setSelectedData(item);
     fetchItem(item.id);
+    setMode("EDIT");
     setIsFormDisabled(false);
     setIsModalOpen(true);
   }
@@ -64,12 +70,14 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
   const openView = (item: Record<string, any>) => {
     setSelectedData(item);
     fetchItem(item.id);
+    setMode("VIEW");
     setIsFormDisabled(true);
     setIsModalOpen(true);
   }
 
   const closeModal = () => {
     setSelectedData({});
+    setMode("");
     setIsModalOpen(false);
   }
 
@@ -132,6 +140,21 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
     setIsListDataLoading(false);
   }
 
+  const submitItem = async (data: Record<string, any>) => {
+    try {
+      const res = await apiFetch(mode == "CREATE" ? resource : `${resource}/${selectedData.id}`, {
+        method: mode === "CREATE" ? "POST" : "PATCH",
+        body: data
+      });
+
+      await fetchList();
+      setIsModalOpen(false);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const deleteItem = async (id: number) => {
     await apiFetch(`${resource}/${id}`, {
       method: "DELETE"
@@ -149,6 +172,7 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
         listData,
         selectedData,
 
+        mode,
         isListDataLoading,
         isSelectedDataLoading,
         isModalOpen,
@@ -162,6 +186,7 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
         openView,
         closeModal,
 
+        submitItem,
         deleteItem,
       }}
     >

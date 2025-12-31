@@ -28,7 +28,6 @@ const AdminLayout = async ({ children }: { children: ReactNode }) => {
       </header>
 
       <div className="flex flex-1">
-        {/* Sidebar */}
         <Sidebar />
 
         <main className="flex-1 p-6 overflow-auto">

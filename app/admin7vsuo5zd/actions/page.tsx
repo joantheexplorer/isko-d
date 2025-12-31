@@ -1,30 +1,24 @@
 "use client";
 
-import DataTable from "@/src/components/DataTable";
-import { useResourceContext } from "@/src/contexts/ResourceContext";
-import { useEffect } from "react";
+import InputGroup from "@/src/components/forms/InputGroup";
+import ResourcePage from "@/src/components/ResourcePage";
+import { actionSchema } from "@/src/schemas/actionSchema";
 
-const fields = [
-  { label: "ID", identifier: "id" },
-  { label: "Action", identifier: "name" }
-];
+const ActionsPage = () => <ResourcePage
+  resource={"actions"}
+  formSchema={actionSchema}
+  fields={[
+    { label: "ID", identifier: "id" },
+    { label: "Action", identifier: "name" }
+  ]}
+  FormInputs={FormInputs}
+/>
 
-const ActionsPage = () => {
-  const { loadResource, listData, isListDataLoading } = useResourceContext();
-
-  useEffect(() => {
-    loadResource("actions");
-  }, [])
-
-  return (
-    <div className="p-6">
-      <h1 className="text-4xl font-extrabold mt-5 mb-6">Actions</h1>
-
-      <div className="overflow-x-auto">
-        <DataTable fields={fields} data={listData} isLoading={isListDataLoading} withActions={true}/>
-      </div>
-    </div>
-  );
-}
+const FormInputs = () => (
+  <>
+    <InputGroup fieldName="name" label="Name" />
+  </>
+);
+  
 
 export default ActionsPage;

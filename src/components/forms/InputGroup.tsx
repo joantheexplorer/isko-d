@@ -8,7 +8,7 @@ type Props = {
   rest?: Record<string, any>
 }
 
-const FormGroup = ({ fieldName, label, noLabel, type, rest }: Props ) => {
+const InputGroup = ({ fieldName, label, noLabel, type, rest }: Props ) => {
   const {
     register,
     formState: { errors }
@@ -30,4 +30,4 @@ const FormGroup = ({ fieldName, label, noLabel, type, rest }: Props ) => {
   );
 }
 
-export default FormGroup;
+export default InputGroup;

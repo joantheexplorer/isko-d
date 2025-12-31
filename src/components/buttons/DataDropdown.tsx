@@ -1,8 +1,15 @@
 import { useResourceContext } from "@/src/contexts/ResourceContext";
-import { EllipsisVerticalIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useFormContext } from "react-hook-form";
 
 const DataDropdown = ({item}: { item: Record<string, any> }) => {
   const { deleteItem, openEdit } = useResourceContext();
+  const { reset } = useFormContext();
+
+  const handleEdit = () => {
+    reset(item);
+    openEdit(item);
+  }
 
   const handleDelete = () => {
     deleteItem(item.id);
@@ -12,7 +19,7 @@ const DataDropdown = ({item}: { item: Record<string, any> }) => {
     <div className="flex gap-2">
       <PencilIcon 
         className="size-6 text-gray-800 ml-auto hover:text-red-600 transition-colors cursor-pointer"
-        onClick={() => openEdit(item)}
+        onClick={handleEdit}
       />
       <TrashIcon 
         className="size-6 text-gray-800 ml-auto hover:text-red-600 transition-colors cursor-pointer"
