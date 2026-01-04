@@ -8,19 +8,14 @@ import jakarta.validation.constraints.NotNull;
 
 public class DeviceRequestDTO {
     @NotNull(groups = {Create.class})
-    private Long location_id;
+    private Long locationId;
 
     @NotBlank(groups = {Create.class})
     private String name;
 
-    @NotBlank(groups = {Create.class})
-    private String token;
+    public Long getLocationId() { return locationId; }
+    public String getName() { return name; }
 
-    public Long getLocation_id()  {return location_id;}
-    public String getName() {return name;}
-    public String getToken() {return token;}
-
-    public void setLocation_id(Long location_id) { this.location_id = location_id; }
+    public void setLocationId(Long locationId) { this.locationId = locationId; }
     public void setName(String name) { this.name =name; }
-    public void setToken(String token) { this.token =token; }
 }

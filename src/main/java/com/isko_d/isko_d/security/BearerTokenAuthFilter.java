@@ -20,6 +20,7 @@ import com.isko_d.isko_d.service.TokenService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -43,6 +44,13 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String plainToken = authHeader.substring(7);
             token = tokenService.validateToken(plainToken);
+        } else if (request.getCookies() != null) {
+            for (Cookie c : request.getCookies()) {
+                if (c.getName().equals("api_token")) {
+                    String plainToken = c.getValue();
+                    token = tokenService.validateToken(plainToken);
+                }
+            }
         } else {
             filterChain.doFilter(request, response);
             return;
@@ -50,24 +58,31 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
 
         if (token != null) {
             Object principal;
-            Collection<GrantedAuthority> authorities;
+            GrantedAuthority authority;
 
             if (token.getUser() != null) {
                 principal = token.getUser();
-                authorities = token.getUser().getRoles().stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-                    .collect(Collectors.toList());
+                authority = new SimpleGrantedAuthority("ROLE_" + token.getUser().getRole().getName());
             } else {
                 principal = token.getDevice();
-                authorities = List.of(new SimpleGrantedAuthority("ROLE_DEVICE"));
+                authority = new SimpleGrantedAuthority("ROLE_DEVICE");
             }
 
-            Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, authorities);
+            Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, List.of(authority));
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else {
             throw new UnauthorizedException("Invalid or expired API token");
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+
+        return path.equals("/api/auth/login")
+            || path.equals("/api/auth/register")
+            || path.equals("/api/auth/logout");
     }
 }

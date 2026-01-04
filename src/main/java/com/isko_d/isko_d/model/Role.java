@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Column;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -30,8 +31,7 @@ public class Role {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy="roles")
-    @JsonBackReference
+    @OneToMany(mappedBy="role")
     Set<User> users = new HashSet<User>();
 
     @CreatedDate

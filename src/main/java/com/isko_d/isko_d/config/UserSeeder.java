@@ -32,7 +32,7 @@ public class UserSeeder {
                 userInfo.setFirstName("Super");
                 userInfo.setLastName("Admin");
                 userInfo.setPassword("qyL2jVlerK8rzu8Ey");
-                userInfo.getRoles().add(superAdminRole.getId());
+                userInfo.setRoleId(superAdminRole.getId());
 
                 userService.save(userInfo);
             } else {

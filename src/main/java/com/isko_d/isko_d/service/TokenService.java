@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.isko_d.isko_d.exception.NotFoundException;
 import com.isko_d.isko_d.model.Device;
 import com.isko_d.isko_d.model.Token;
 import com.isko_d.isko_d.model.User;
@@ -21,6 +22,16 @@ public class TokenService {
         this.hasher = hasher;
     }
 
+    public Token findByDevice(Device device) {
+        Token token = tokenRepository.findByDevice(device);
+        
+        if (token == null) {
+            throw new NotFoundException(Token.class, device.getId(), "device");
+        }
+
+        return token;
+    }
+
     public String createToken(User user) {
         return createToken(user, null);
     }
@@ -33,7 +44,7 @@ public class TokenService {
         String plain = UUID.randomUUID().toString();
         String lookup = hasher.sha256(plain);
         String hash = hasher.bcrypt(plain);
-        LocalDateTime expiresAt = LocalDateTime.now().plusHours(3);
+        LocalDateTime expiresAt = user == null ? null : LocalDateTime.now().plusHours(3);
 
         Token token = new Token(user, device, lookup, hash, expiresAt);
         tokenRepository.save(token);

@@ -7,19 +7,14 @@ import jakarta.validation.constraints.NotBlank;
 public class LogRequestDTO {
 
     @NotBlank(groups=Create.class)
-    private String actionType;
+    private Long deviceId;
 
     @NotBlank(groups=Create.class)
-    private String location;
+    private Long actionId;
 
-    @NotBlank(groups=Create.class)
-    private String deviceId;
+    public Long getDeviceId() { return deviceId; }
+    public Long getActionId() { return actionId; }
 
-    public String getActionType() { return actionType; }
-    public String getLocation() { return location; }
-    public String getDeviceId() { return deviceId; }
-
-    public void setActionType(String actionType) { this.actionType = actionType; }
-    public void setLocation(String location) { this.location = location; }
-    public void setDeviceId(String deviceId) { this.deviceId = deviceId; }
+    public void setDeviceId(Long deviceId) { this.deviceId = deviceId; }
+    public void setActionId(Long actionId) { this.actionId = actionId; }
 }

@@ -5,7 +5,6 @@ import com.isko_d.isko_d.validation.Update;
 import jakarta.validation.constraints.NotBlank;
 
 public class DepartmentRequestDTO {
-
     @NotBlank(groups=Create.class, message = "Name is required")
     private String name;
 

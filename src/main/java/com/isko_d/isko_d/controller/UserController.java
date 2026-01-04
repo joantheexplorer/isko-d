@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasRole('SUPERADMIN')")
 @RequestMapping(path="/users")
 public class UserController {
     private final UserService userService;
@@ -44,7 +45,6 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
     @PostMapping
     public ResponseEntity<UserResponseDTO> save(
             @RequestBody @Validated(Create.class) UserRequestDTO request

@@ -65,7 +65,6 @@ public class RoleService {
         Role deleted = roleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Role.class, id));
 
-        deleted.getUsers().forEach(user -> user.getRoles().remove(deleted));
         roleRepository.deleteById(id);
 
         return new RoleResponseDTO(deleted);

@@ -1,8 +1,12 @@
 package com.isko_d.isko_d.service;
 
+import com.isko_d.isko_d.model.Action;
+import com.isko_d.isko_d.model.Device;
 import com.isko_d.isko_d.model.Log;
 import com.isko_d.isko_d.dto.log.LogRequestDTO;
 import com.isko_d.isko_d.dto.log.LogResponseDTO;
+import com.isko_d.isko_d.repository.ActionRepository;
+import com.isko_d.isko_d.repository.DeviceRepository;
 import com.isko_d.isko_d.repository.LogRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -11,9 +15,17 @@ import java.util.List;
 @Service
 public class LogService {
     private final LogRepository logRepository;
+    private final DeviceRepository deviceRepository;
+    private final ActionRepository actionRepository;
 
-    public LogService(LogRepository logRepository) {
+    public LogService(
+        LogRepository logRepository,
+        DeviceRepository deviceRepository,
+        ActionRepository actionRepository
+    ) {
         this.logRepository = logRepository;
+        this.deviceRepository = deviceRepository;
+        this.actionRepository = actionRepository;
     }
 
     public List<LogResponseDTO> findAll() {
@@ -31,11 +43,12 @@ public class LogService {
 
     public LogResponseDTO save(LogRequestDTO request) {
         Log saved = logRepository.save(new Log(
-            request.getActionType(),
-            request.getLocation(),
-            request.getDeviceId()
+            deviceRepository.findById(request.getDeviceId())
+                .orElseThrow(() -> new NotFoundException(Device.class, request.getDeviceId())),
+            actionRepository.findById(request.getActionId())
+                .orElseThrow(() -> new NotFoundException(Action.class, request.getActionId()))
         ));
-
+        
         return new LogResponseDTO(saved);
     }
 
@@ -43,9 +56,17 @@ public class LogService {
         Log existing = logRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Log.class, id));
 
-        if (request.getActionType() != null && !request.getActionType().isBlank()) existing.setActionType(request.getActionType());
-        if (request.getLocation() != null && !request.getLocation().isBlank()) existing.setLocation(request.getLocation());
-        if (request.getDeviceId() != null && !request.getDeviceId().isBlank()) existing.setDeviceId(request.getDeviceId());
+        if (request.getDeviceId() != null) {
+            Device device = deviceRepository.findById(request.getDeviceId())
+                .orElseThrow(() -> new NotFoundException(Device.class, request.getDeviceId()));
+            existing.setDevice(device);
+        }
+
+        if (request.getActionId() != null) {
+            Action action = actionRepository.findById(request.getActionId())
+                .orElseThrow(() -> new NotFoundException(Action.class, request.getActionId()));
+            existing.setAction(action);
+        }
 
         Log saved = logRepository.save(existing);
 

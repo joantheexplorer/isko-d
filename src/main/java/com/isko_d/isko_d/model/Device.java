@@ -17,13 +17,17 @@ public class Device {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "location_id")
-    private Location location_id;
+    private Location location;
 
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String token;
+    @OneToOne(
+        mappedBy = "device",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private Token token;
 
     @CreatedDate
     @Column(updatable = false)
@@ -35,25 +39,24 @@ public class Device {
     public Device() {}
 
     public Device(
-        Location location_id,
+        Location location,
         String name,
-        String token
+        Token token
     ) {
-        this.location_id= location_id;
+        this.location= location;
         this.name = name;
         this.token = token;
     }
 
     public Long getId() { return id; }
-    public Location getLocation_id() { return location_id; }
+    public Location getLocation() { return location; }
     public String getName() { return name; }
-    public String getToken() { return token; }
+    public Token getToken() { return token; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
     public void setId(Long id) { this.id = id; }
-    public void setLocation_id(Location location_id) { this.location_id = location_id; }
+    public void setLocation(Location location) { this.location = location; }
     public void setName(String name) { this.name = name; }
-    public void setToken(String token) { this.token = token; }
-
+    public void setToken(Token token) { this.token = token; }
 }

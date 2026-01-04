@@ -20,6 +20,10 @@ import com.isko_d.isko_d.service.TokenService;
 import com.isko_d.isko_d.service.UserService;
 import com.isko_d.isko_d.validation.Create;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -61,13 +65,26 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> revokeToken(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Void> revokeToken(HttpServletRequest request, HttpServletResponse response) {
+        String plainToken = null;
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            plainToken = authHeader.substring(7);
         }
 
-        String plainToken = authHeader.substring(7);
-        tokenService.revokeToken(plainToken);
+        if (plainToken == null && request.getCookies() != null) {
+            for (Cookie c : request.getCookies()) {
+                if (c.getName().equals("api_token")) {
+                    plainToken = c.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (plainToken != null) {
+            tokenService.revokeToken(plainToken);
+        }
 
         ResponseCookie cookie = ResponseCookie.from("api_token", "")
             .httpOnly(true)

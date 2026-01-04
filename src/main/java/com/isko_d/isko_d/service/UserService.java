@@ -2,7 +2,6 @@ package com.isko_d.isko_d.service;
 
 import com.isko_d.isko_d.model.Role;
 import com.isko_d.isko_d.model.User;
-import com.isko_d.isko_d.dto.error.UnauthorizedResponse;
 import com.isko_d.isko_d.dto.login.LoginResponseDTO;
 import com.isko_d.isko_d.dto.user.StudentRequestDTO;
 import com.isko_d.isko_d.dto.user.UserRequestDTO;
@@ -53,18 +52,18 @@ public class UserService {
     }
 
     public UserResponseDTO save(UserRequestDTO request) {
+        Role role = roleRepository.findById(request.getRoleId())
+            .orElseThrow(() -> new NotFoundException(Role.class, request.getRoleId()));
+
         User saved = new User(
                 request.getBarcode(),
                 request.getFirstName(),
                 request.getMiddleName(),
                 request.getLastName(),
                 request.getEmail(),
-                bCryptEncoder.encode(request.getPassword())
+                bCryptEncoder.encode(request.getPassword()),
+                role
         );
-
-        request.getRoles().forEach(roleId -> {
-            roleRepository.findById(roleId).ifPresent(role -> saved.getRoles().add(role));
-        });
 
         return new UserResponseDTO(userRepository.save(saved));
     }
@@ -78,10 +77,11 @@ public class UserService {
         if (request.getLastName() != null && !request.getLastName().isBlank()) existing.setLastName(request.getLastName());
         if (request.getEmail() != null && !request.getEmail().isBlank()) existing.setEmail(request.getEmail());
         if (request.getPassword() != null && !request.getPassword().isBlank()) existing.setPassword(request.getPassword());
-        
-        request.getRoles().forEach(roleId -> {
-            roleRepository.findById(roleId).ifPresent(role -> existing.getRoles().add(role));
-        });
+        if (request.getRoleId() != null){ 
+            Role role = roleRepository.findById(request.getRoleId())
+                .orElseThrow(() -> new NotFoundException(Role.class, request.getRoleId()));
+            existing.setRole(role);
+        }
 
         User saved = userRepository.save(existing);
 
@@ -92,8 +92,6 @@ public class UserService {
         User deleted = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(User.class, id));
 
-        deleted.getRoles().forEach(role -> role.getUsers().remove(deleted));
-
         userRepository.deleteById(id);
 
         return new UserResponseDTO(deleted);
@@ -103,9 +101,8 @@ public class UserService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UnauthorizedException("Incorrect credentials"));
 
-        boolean isAdmin = user.getRoles().stream()
-            .map(Role::getName)
-            .anyMatch(name -> "ADMIN".equals(name) || "SUPERADMIN".equals(name));
+        boolean isAdmin = user.getRole().getName().equals("ADMIN")
+            || user.getRole().getName().equals("SUPERADMIN");
 
         if (isAdmin && bCryptEncoder.matches(password, user.getPassword())) {
             return new LoginResponseDTO(user, tokenService.createToken(user));
@@ -115,19 +112,21 @@ public class UserService {
     }
 
     public UserResponseDTO registerStudent(StudentRequestDTO request) {
+        Role studentRole = roleRepository.findByName("STUDENT")
+            .orElseThrow(() -> new NotFoundException(Role.class, "STUDENT", "name"));
+        
         User saved = new User(
                 request.getBarcode(),
                 request.getFirstName(),
                 request.getMiddleName(),
                 request.getLastName(),
                 request.getEmail(),
-                bCryptEncoder.encode(request.getPassword())
+                bCryptEncoder.encode(request.getPassword()),
+                studentRole
         );
 
-        Role studentRole = roleRepository.findByName("STUDENT")
-            .orElseThrow(() -> new NotFoundException(Role.class, "STUDENT", "name"));
 
-        saved.getRoles().add(studentRole);
+        saved.setRole(studentRole);
 
         return new UserResponseDTO(userRepository.save(saved));
     }

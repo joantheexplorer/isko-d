@@ -6,11 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="departments")
@@ -23,6 +27,13 @@ public class Department {
 
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(
+        mappedBy = "department",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Program> programs = new ArrayList<>();
 
     @CreatedDate
     @Column(updatable = false)
