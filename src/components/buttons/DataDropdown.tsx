@@ -7,7 +7,17 @@ const DataDropdown = ({item}: { item: Record<string, any> }) => {
   const { reset } = useFormContext();
 
   const handleEdit = () => {
-    reset(item);
+    reset(() => {
+      const result: Record<string, any> = { ...item };
+
+      Object.entries(item).forEach(([key, value]) => {
+        if (value && typeof value === "object" && "id" in value) {
+          result[`${key}Id`] = value.id;
+        }
+      });
+
+      return result;
+    });
     openEdit(item);
   }
 

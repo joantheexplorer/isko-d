@@ -11,12 +11,12 @@ const sidebarOptions = [
   { label: "Locations", href: "/locations", isHighlighted: false },
   { label: "Programs", href: "/programs", isHighlighted: false },
   { label: "Roles", href: "/roles", isHighlighted: false },
-  { label: "Tokens", href: "/tokens", isHighlighted: false },
   { label: "Users", href: "/users", isHighlighted: false },
 ]
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const isSuperAdmin = localStorage.getItem("user_role") == "SUPERADMIN";
 
   return (
     <aside className="hidden md:flex md:flex-col w-64 text-white">
@@ -24,6 +24,8 @@ const Sidebar = () => {
         { sidebarOptions.map((option, idx) => {
           const href = `/admin7vsuo5zd${option.href}`;
           const isHighlighted = href === pathname;
+          
+          if (!isSuperAdmin && option.label == "Users") return null;
 
           return (
             <Link 

@@ -24,6 +24,7 @@ const LoginPage = () => {
         body: data
       });
 
+      localStorage.setItem("user_role", res.role);
       router.push("/admin7vsuo5zd");
 
     } catch (error) {

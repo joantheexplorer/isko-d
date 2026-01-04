@@ -2,14 +2,14 @@
 
 import InputGroup from "@/src/components/forms/InputGroup";
 import ResourcePage from "@/src/components/ResourcePage";
-import { actionSchema } from "@/src/schemas/actionSchema";
+import { departmentSchema } from "@/src/schemas/departmentSchema";
 
-const ActionsPage = () => <ResourcePage
-  resource={"actions"}
-  formSchema={actionSchema}
+const DepartmentsPage = () => <ResourcePage
+  resource={"departments"}
+  formSchema={departmentSchema}
   fields={[
     { label: "ID", accessor: (row) => row.id },
-    { label: "Action", accessor: (row) => row.name }
+    { label: "Department", accessor: (row) => row.name }
   ]}
   FormInputs={FormInputs}
 />
@@ -21,4 +21,4 @@ const FormInputs = () => (
 );
   
 
-export default ActionsPage;
+export default DepartmentsPage;

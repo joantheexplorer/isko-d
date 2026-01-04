@@ -7,6 +7,9 @@ export type ResourceContextType = {
   setResource: Dispatch<SetStateAction<string>>;
   setListParams: Dispatch<SetStateAction<Record<string, any>>>;
   setSelectedParams: Dispatch<SetStateAction<Record<string, any>>>;
+  setLastCreatedToken: Dispatch<SetStateAction<string>>;
+
+  lastCreatedToken: string;
 
   listData: Record<string, any>[];
   selectedData: Record<string, any>;
@@ -51,6 +54,8 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
   const [isFormDisabled, setIsFormDisabled] = useState<boolean>(false);
   const [isListDataLoading, setIsListDataLoading] = useState<boolean>(false);
   const [isSelectedDataLoading, setIsSelectedDataLoading] = useState<boolean>(false);
+
+  const [lastCreatedToken, setLastCreatedToken] = useState<string>("");
 
   const openCreate = () => {
     setSelectedData({});
@@ -147,6 +152,8 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
         body: data
       });
 
+      if (res?.token) setLastCreatedToken(res.token);
+
       await fetchList();
       setIsModalOpen(false);
 
@@ -168,6 +175,9 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
         setResource,
         setListParams,
         setSelectedParams,
+        setLastCreatedToken,
+
+        lastCreatedToken,
 
         listData,
         selectedData,

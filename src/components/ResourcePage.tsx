@@ -10,7 +10,7 @@ import FormModal from "./forms/FormModal";
 type Props = {
   formSchema: ZodType<any, any>;
   resource: string;
-  fields: { label: string; identifier: string; }[];
+  fields: { label: string; accessor: (row: Record<string, any>) => string; }[];
   FormInputs: () => ReactNode;
 }
 
@@ -40,6 +40,11 @@ const ResourcePage = ({ formSchema, resource, fields, FormInputs }: Props) => {
     methods.reset();
   }
 
+  const handleClose = () => {
+    closeModal();
+    methods.reset();
+  }
+
   return (
     <div className="p-6">
       <div className="flex flex-row items-end justify-between pb-3">
@@ -56,7 +61,7 @@ const ResourcePage = ({ formSchema, resource, fields, FormInputs }: Props) => {
         <FormModal 
           isOpen={isModalOpen}
           title={resource[0].toUpperCase() + resource.slice(1)}
-          handleClose={closeModal}
+          handleClose={handleClose}
           formInputs={
               <form id="modal-form" onSubmit={methods.handleSubmit(onSubmit)}>
                 <FormInputs />

@@ -1,11 +1,12 @@
 import DataDropdown from "./buttons/DataDropdown";
 
 type Props = {
-  fields: { label: string, identifier: string }[],
+  fields: { label: string, accessor: (row: Record<string, any>) => string }[],
   data: Record<string, any>[],
   withActions?: boolean,
   isLoading: boolean
 }
+
 const DataTable = ({ fields, data, withActions, isLoading }: Props) => {
   return (
     <table className="min-w-full border border-gray-200 shadow-md rounded-lg overflow-auto">
@@ -58,7 +59,8 @@ const DataTable = ({ fields, data, withActions, isLoading }: Props) => {
                     key={`row${idx}${field.label}${idx2}`}
                     className="px-4 py-2 text-sm text-gray-800"
                     >
-                    {entry?.[field.identifier]}</td>
+                      {field.accessor(entry)}
+                    </td>
                   ))}
                   <td className="px-4 py-2"><DataDropdown item={entry} /></td>
                   </tr>
