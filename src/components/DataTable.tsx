@@ -50,7 +50,7 @@ const DataTable = ({ fields, data, withActions, isLoading }: Props) => {
                 </div>
               </td>
             </tr>
-          : data.length > 0
+          : data?.length > 0
             ? (data ?? []).map((entry: Record<string, any>, idx: number) => {
                 return (
                   <tr key={`row${idx}`} className="hover:bg-red-100 transition-colors">

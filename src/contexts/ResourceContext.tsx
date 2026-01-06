@@ -2,6 +2,7 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 import apiFetch from "../utils/apiFetch";
+import { ApiError } from "../types/ApiError";
 
 export type ResourceContextType = {
   setResource: Dispatch<SetStateAction<string>>;
@@ -135,14 +136,20 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
       }
     });
 
-    const data = await apiFetch(
-      `${res}?${searchParams.toString()}`,
-      {}
-    );
-
-    setListData(data);
-
-    setIsListDataLoading(false);
+    try {
+      const data = await apiFetch(
+        `${res}?${searchParams.toString()}`,
+        {}
+      );
+      setListData(data);
+      setIsListDataLoading(false);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.status === 204) {
+          setIsListDataLoading(false);
+        }
+      }
+    }
   }
 
   const submitItem = async (data: Record<string, any>) => {
@@ -152,11 +159,10 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
         body: data
       });
 
-      if (res?.token) setLastCreatedToken(res.token);
-
       await fetchList();
       setIsModalOpen(false);
 
+      if (res?.plainToken) setLastCreatedToken(res.plainToken);
     } catch (error) {
       console.error(error);
     }
