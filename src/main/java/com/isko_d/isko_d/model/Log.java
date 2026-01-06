@@ -24,6 +24,10 @@ public class Log {
     private Long id;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "device_id")
     private Device device;
 
@@ -41,20 +45,24 @@ public class Log {
     public Log() {}
 
     public Log(
+        User user,
         Device device,
         Action action
     ) {
+        this.user = user;
         this.device = device;
         this.action = action;
     }
 
     public Long getId() { return id; }
+    public User getUser() { return user; }
     public Device getDevice() { return device; }
     public Action getAction() { return action; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
     public void setId(Long id) { this.id = id; }
+    public void setUser(User user) { this.user = user; }
     public void setDevice(Device device) { this.device = device; }
     public void setAction(Action action) { this.action = action; }
 }
