@@ -7,14 +7,19 @@ import jakarta.validation.constraints.NotBlank;
 public class LogRequestDTO {
 
     @NotBlank(groups=Create.class)
+    private String barcode;
+
+    @NotBlank(groups=Create.class)
     private Long deviceId;
 
     @NotBlank(groups=Create.class)
     private Long actionId;
 
+    public String getBarcode() { return barcode; }
     public Long getDeviceId() { return deviceId; }
     public Long getActionId() { return actionId; }
 
+    public void setBarcode(String barcode) { this.barcode = barcode; }
     public void setDeviceId(Long deviceId) { this.deviceId = deviceId; }
     public void setActionId(Long actionId) { this.actionId = actionId; }
 }
