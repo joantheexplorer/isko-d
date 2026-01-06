@@ -4,24 +4,29 @@ const apiFetch = async (
   resource: string,
   options: Record<string, any>
 ) => {
+  const { method, headers, credentials, body, ...rest } = options;
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${resource}`, {
-    method: options.method ?? "GET",
+    ...rest,
+    method: method ?? "GET",
     headers: {
       "Content-Type": "application/json",
-      ...options?.headers,
+      ...headers,
     },
-    credentials: "include",
-    ...options,
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    credentials: credentials ?? "include",
+    body: body ? JSON.stringify(body) : undefined,
   });
 
-  const isJson = res.headers.get("Content-Type")?.includes("application/json");
+  let data = null;
 
-  const body = isJson ? await res.json() : await res.text();
+  const contentType = res.headers.get("content-type");
+  if (contentType?.includes("application/json")) {
+    const text = await res.text();
+    data = text ? JSON.parse(text) : null;
+  }
 
-  if (!res.ok) throw new ApiError(res.status, body);
+  if (!res.ok) throw new ApiError(res.status, data);
 
-  return body;
+  return data;
 }
 
 export default apiFetch;

@@ -1,55 +1,55 @@
 "use client";
 
-import { KioskInputs, kioskSchema } from "@/src/schemas/kioskSchema";
-import { ApiError } from "@/src/types/ApiError";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { BarcodeScanner, DetectedBarcode } from "react-barcode-scanner";
-import "react-barcode-scanner/polyfill";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { onboardingSchema, OnboardingInputs } from "@/src/schemas/onboardingSchema";
+import apiFetch from "@/src/utils/apiFetch";
+import { ApiError } from "@/src/types/ApiError";
+import InputGroup from "@/src/components/forms/InputGroup";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const KioskPage = () => {
-  const methods = useForm<KioskInputs>({
-    resolver: zodResolver(kioskSchema)
-  });
+const KioskOnboardingPage = () => {
   const router = useRouter();
-  const [barcodes, setBarcodes] = useState([]);
 
   useEffect(() => {
     const deviceToken = localStorage.getItem("device_token");
-    // if (deviceToken == null) router.push("onboarding")
-  }, [])
+    if (deviceToken) router.push("/");
+  }, []);
+
+  const methods = useForm<OnboardingInputs>({
+    resolver: zodResolver(onboardingSchema)
+  });
 
   const rootError = methods.formState.errors?.root;
 
-  const onSubmit: SubmitHandler<KioskInputs> = async (data) => {
+  const onSubmit: SubmitHandler<OnboardingInputs> = async (data) => {
     try {
-      const res = await apiFetch("kiosk/log", {
+      const res = await apiFetch("kiosk/validate", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("device_token")}`
+          Authorization: `Bearer ${data.plainToken}`
         },
         method: "POST",
         body: data,
         credentials: "omit"
       });
+
+      localStorage.setItem("device_token", data.plainToken);
+      localStorage.setItem("device_id", res.id);
+
+      router.push("/");
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
-          localStorage.removeItem("device_token");
-          localStorage.removeItem("device_id");
-          router.push("/onboarding");
+          methods.setError("root", {
+            message: "Invalid token. Please contact your administrator."
+          })
         }
       } else {
         console.error(error);
       }
     }
-  }
-
-  const handleCapture = (barcodes) => {
-    console.log(barcodes);
-    setBarcodes(barcodes);
   }
 
   return (
@@ -64,12 +64,10 @@ const KioskPage = () => {
           <strong>PUP: University Library and Learning Resources Center</strong>
         </p>
         <FormProvider {...methods}>
+          <p className="mt-4">Enter a valid API token provided by your local administrator.</p>
           <form className="w-full md:w-1/2 lg:w-1/3 mt-5" onSubmit={methods.handleSubmit(onSubmit)}>
-            <BarcodeScanner 
-              onCapture={handleCapture}
-              options={{ formats: ['code_39'] }}
-            />
-            {barcodes.map((barcode) => <p>{barcode?.rawValue}</p>)}
+            <p className="text-red-600">{rootError?.message}</p>
+            <InputGroup fieldName="plainToken" label="Token" noLabel={true} />
             <button className="bg-red-900 text-center text-white p-2 rounded-md w-full cursor-pointer hover:bg-red-800 transition-colors">
               <strong>Submit</strong>
             </button>
@@ -80,4 +78,4 @@ const KioskPage = () => {
   );
 }
 
-export default KioskPage;
+export default KioskOnboardingPage;

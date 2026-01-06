@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const sidebarOptions = [
   { label: "Dashboard", href: "", isHighlighted: false },
@@ -16,7 +17,11 @@ const sidebarOptions = [
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const isSuperAdmin = localStorage.getItem("user_role") == "SUPERADMIN";
+  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsSuperAdmin(localStorage.getItem("user_role") == "SUPERADMIN");
+  }, [])
 
   return (
     <aside className="hidden md:flex md:flex-col w-64 text-white">
