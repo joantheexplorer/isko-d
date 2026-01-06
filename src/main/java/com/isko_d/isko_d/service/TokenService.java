@@ -56,9 +56,13 @@ public class TokenService {
         String lookup = hasher.sha256(plainToken);
         Token token = tokenRepository.findByTokenLookup(lookup);
         if (token != null 
-            && token.getExpiresAt().isAfter(LocalDateTime.now())
-            && hasher.matches(plainToken, token.getTokenHash())) {
-            return token;
+            && hasher.matches(plainToken, token.getTokenHash())
+        ) {
+            if (token.getExpiresAt() == null 
+                || token.getExpiresAt().isAfter(LocalDateTime.now())
+            ) {
+                return token;
+            }
         }
         return null;
     }

@@ -3,11 +3,13 @@ package com.isko_d.isko_d.service;
 import com.isko_d.isko_d.model.Action;
 import com.isko_d.isko_d.model.Device;
 import com.isko_d.isko_d.model.Log;
+import com.isko_d.isko_d.model.User;
 import com.isko_d.isko_d.dto.log.LogRequestDTO;
 import com.isko_d.isko_d.dto.log.LogResponseDTO;
 import com.isko_d.isko_d.repository.ActionRepository;
 import com.isko_d.isko_d.repository.DeviceRepository;
 import com.isko_d.isko_d.repository.LogRepository;
+import com.isko_d.isko_d.repository.UserRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -17,15 +19,18 @@ public class LogService {
     private final LogRepository logRepository;
     private final DeviceRepository deviceRepository;
     private final ActionRepository actionRepository;
+    private final UserRepository userRepository;
 
     public LogService(
         LogRepository logRepository,
         DeviceRepository deviceRepository,
-        ActionRepository actionRepository
+        ActionRepository actionRepository,
+        UserRepository userRepository
     ) {
         this.logRepository = logRepository;
         this.deviceRepository = deviceRepository;
         this.actionRepository = actionRepository;
+        this.userRepository = userRepository;
     }
 
     public List<LogResponseDTO> findAll() {
@@ -43,6 +48,8 @@ public class LogService {
 
     public LogResponseDTO save(LogRequestDTO request) {
         Log saved = logRepository.save(new Log(
+            userRepository.findByBarcode(request.getBarcode())
+                .orElseThrow(() -> new NotFoundException(User.class, request.getBarcode(), "barcode")),
             deviceRepository.findById(request.getDeviceId())
                 .orElseThrow(() -> new NotFoundException(Device.class, request.getDeviceId())),
             actionRepository.findById(request.getActionId())
