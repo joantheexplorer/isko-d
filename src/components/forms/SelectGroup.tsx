@@ -8,6 +8,7 @@ type Props = {
   options: Record<string, any>[];
   isMulti?: boolean;
   placeholder?: string;
+  required?: boolean;
 };
 
 const SelectGroup = ({
@@ -17,6 +18,7 @@ const SelectGroup = ({
   options,
   isMulti = false,
   placeholder,
+  required
 }: Props) => {
   const {
     control,
@@ -32,6 +34,9 @@ const SelectGroup = ({
         htmlFor={fieldName}
       >
         {label ?? fieldName}
+        { required &&
+          <span className="text-red-600"> *</span>
+        }
       </label>
 
       <Controller
@@ -39,6 +44,16 @@ const SelectGroup = ({
         control={control}
         render={({ field }) => (
           <Select
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                borderColor: state.isFocused ? '#ef4444' : base.borderColor,
+                boxShadow: state.isFocused ? '0 0 0 1px #ef4444' : 'none',
+                '&:hover': {
+                  borderColor: '#ef4444',
+                },
+              }),
+            }}
             {...field}
             options={options}
             isMulti={isMulti}
@@ -47,6 +62,7 @@ const SelectGroup = ({
             className={
               error ? "react-select-container border-red-500" : ""
             }
+            instanceId={fieldName}
             value={
               isMulti
                 ? options.filter(opt =>

@@ -27,13 +27,13 @@ const FormModal = ({ isOpen, title, handleClose, formInputs }: Props) => {
               const form = document.getElementById("modal-form") as HTMLFormElement | null;
               form?.requestSubmit();
             }}
-            className="bg-red-700 rounded-sm text-white hover:bg-red-600 p-2"
+            className="bg-red-700 rounded-sm text-white hover:bg-red-600 p-2 transition-colors"
           >
             Submit
           </button>
           <button
             onClick={handleClose}
-            className="bg-gray-800/50 rounded-sm text-white hover:bg-gray-700/50 p-2"
+            className="bg-gray-800/50 rounded-sm text-white hover:bg-gray-700/50 p-2 transition-colors"
           >
             Close
           </button>

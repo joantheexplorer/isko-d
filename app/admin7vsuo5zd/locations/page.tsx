@@ -8,15 +8,17 @@ const LocationsPage = () => <ResourcePage
   resource={"locations"}
   formSchema={locationSchema}
   fields={[
-    { label: "ID", accessor: (row) => row.id },
     { label: "Location", accessor: (row) => row.name }
+  ]}
+  searchOptions={[
+    { label: "Location", value: "name" }
   ]}
   FormInputs={FormInputs}
 />
 
 const FormInputs = () => (
   <>
-    <InputGroup fieldName="name" label="Name" />
+    <InputGroup fieldName="name" label="Name" required />
   </>
 );
   

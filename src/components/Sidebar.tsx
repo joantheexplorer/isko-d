@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 const sidebarOptions = [
   { label: "Dashboard", href: "", isHighlighted: false },
   { label: "Actions", href: "/actions", isHighlighted: false },
-  { label: "Departments", href: "/departments", isHighlighted: false },
-  { label: "Devices", href: "/devices", isHighlighted: false },
   { label: "Locations", href: "/locations", isHighlighted: false },
+  { label: "Devices", href: "/devices", isHighlighted: false },
+  { label: "Departments", href: "/departments", isHighlighted: false },
   { label: "Programs", href: "/programs", isHighlighted: false },
-  { label: "Roles", href: "/roles", isHighlighted: false },
   { label: "Users", href: "/users", isHighlighted: false },
+  { label: "Roles", href: "/roles", isHighlighted: false },
 ]
 
 const Sidebar = () => {
@@ -31,10 +31,11 @@ const Sidebar = () => {
           const isHighlighted = href === pathname;
           
           if (!isSuperAdmin && option.label == "Users") return null;
+          if (!isSuperAdmin && option.label == "Roles") return null;
 
           return (
             <Link 
-              className={`block px-4 py-2 rounded hover:bg-red-700 ${isHighlighted ? "bg-red-700" : ""}`}
+              className={`block px-4 py-2 rounded hover:bg-red-700 ${isHighlighted ? "bg-red-700" : ""} transition-colors`}
               key={`sidebarOption${idx}`}
               href={href}
             >

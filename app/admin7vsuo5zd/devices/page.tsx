@@ -9,7 +9,7 @@ import apiFetch from "@/src/utils/apiFetch";
 import toSelectOptions from "@/src/utils/toSelectOptions";
 import { useEffect, useState } from "react";
 
-const ProgramsPage = () => {
+const DevicesPage = () => {
   const { lastCreatedToken, setLastCreatedToken } = useResourceContext();
 
   const handleClose = () => {
@@ -22,9 +22,12 @@ const ProgramsPage = () => {
         resource={"devices"}
         formSchema={deviceSchema}
         fields={[
-          { label: "ID", accessor: (row) => row.id },
           { label: "Device", accessor: (row) => row.name },
           { label: "Location", accessor: (row) => row.location?.name }
+        ]}
+        searchOptions={[
+          { label: "Device", value: "name" },
+          { label: "Location", value: "location" },
         ]}
         FormInputs={FormInputs}
       />
@@ -65,8 +68,8 @@ const FormInputs = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const locationsRaw = await apiFetch("locations", {});
-        setLocations(toSelectOptions(locationsRaw, "id", "name"));
+        const locationsRaw = await apiFetch("locations?all=true", {});
+        setLocations(toSelectOptions(locationsRaw?.content, "id", "name"));
       } catch (error) {
         console.error(error);
       }
@@ -76,11 +79,11 @@ const FormInputs = () => {
 
   return (
     <>
-      <InputGroup fieldName="name" label="Name" />
-      <SelectGroup fieldName="locationId" label="Location" options={locations} />
+      <InputGroup fieldName="name" label="Name" required />
+      <SelectGroup fieldName="locationId" label="Location" options={locations} required />
     </>
   );
 }
   
 
-export default ProgramsPage;
+export default DevicesPage;

@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
 import apiFetch from "../utils/apiFetch";
 import { ApiError } from "../types/ApiError";
+import { PaginatedResponse } from "../types/paginatedResponse";
+import { useRouter } from "next/navigation";
 
 export type ResourceContextType = {
   setResource: Dispatch<SetStateAction<string>>;
@@ -12,7 +14,7 @@ export type ResourceContextType = {
 
   lastCreatedToken: string;
 
-  listData: Record<string, any>[];
+  listData: PaginatedResponse;
   selectedData: Record<string, any>;
 
   mode: "EDIT" | "CREATE" | "VIEW" | "";
@@ -43,12 +45,21 @@ export const useResourceContext = () => {
 }
 
 export const ResourceContextProvider = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
+
   const [resource, setResource] = useState<string>("");
   const [mode, setMode] = useState<"EDIT" | "CREATE" | "VIEW" | "">("");
   const [listParams, setListParams] = useState<Record<string, any>>({});
   const [selectedParams, setSelectedParams] = useState<Record<string, any>>({});
 
-  const [listData, setListData] = useState<Record<string, any>[]>([]);
+  const [listData, setListData] = useState<PaginatedResponse>({
+    content: [],
+    page: 0,
+    size: 0,
+    totalElements: 0,
+    totalPages: 0,
+    last: true
+  });
   const [selectedData, setSelectedData] = useState<Record<string, any>>({});
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -57,6 +68,10 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
   const [isSelectedDataLoading, setIsSelectedDataLoading] = useState<boolean>(false);
 
   const [lastCreatedToken, setLastCreatedToken] = useState<string>("");
+
+  useEffect(() => {
+    if (resource) fetchList();
+  }, [listParams]);
 
   const openCreate = () => {
     setSelectedData({});
@@ -147,6 +162,9 @@ export const ResourceContextProvider = ({ children }: { children: ReactNode }) =
       if (error instanceof ApiError) {
         if (error.status === 204) {
           setIsListDataLoading(false);
+        } else if (error.status === 401) {
+          apiFetch("auth/logout", { method: "POST" });
+          router.push("/admin7vsuo5zd/login");
         }
       }
     }

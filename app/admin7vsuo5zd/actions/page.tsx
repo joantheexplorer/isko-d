@@ -8,15 +8,17 @@ const ActionsPage = () => <ResourcePage
   resource={"actions"}
   formSchema={actionSchema}
   fields={[
-    { label: "ID", accessor: (row) => row.id },
     { label: "Action", accessor: (row) => row.name }
+  ]}
+  searchOptions={[
+    { label: "Action", value: "name" }
   ]}
   FormInputs={FormInputs}
 />
 
 const FormInputs = () => (
   <>
-    <InputGroup fieldName="name" label="Name" />
+    <InputGroup fieldName="name" label="Name" required />
   </>
 );
   

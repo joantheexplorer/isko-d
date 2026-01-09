@@ -12,8 +12,12 @@ const ProgramsPage = () => <ResourcePage
   resource={"programs"}
   formSchema={programSchema}
   fields={[
-    { label: "ID", accessor: (row) => row.id },
-    { label: "Program", accessor: (row) => row.name }
+    { label: "Program", accessor: (row) => row.name },
+    { label: "Department", accessor: (row) => row.department?.name }
+  ]}
+  searchOptions={[
+    { label: "Program", value: "name" },
+    { label: "Department", value: "department" }
   ]}
   FormInputs={FormInputs}
 />
@@ -24,8 +28,8 @@ const FormInputs = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const departmentsRaw = await apiFetch("departments", {});
-        setDepartments(toSelectOptions(departmentsRaw, "id", "name"));
+        const departmentsRaw = await apiFetch("departments?all=true", {});
+        setDepartments(toSelectOptions(departmentsRaw?.content, "id", "name"));
       } catch (error) {
         console.error(error);
       }
@@ -35,8 +39,8 @@ const FormInputs = () => {
 
   return (
     <>
-      <InputGroup fieldName="name" label="Name" />
-      <SelectGroup fieldName="departmentId" label="Department" options={departments} />
+      <InputGroup fieldName="name" label="Name" required />
+      <SelectGroup fieldName="departmentId" label="Department" options={departments} required />
     </>
   );
 }
