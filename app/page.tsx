@@ -111,12 +111,6 @@ const KioskPage = () => {
     methods.reset();
   }
 
-  const test = () => {
-    methods.setValue("barcode", "2024-02756-MN-0", { shouldValidate: true });
-    methods.setValue("deviceId", Number(localStorage.getItem("device_id")), { shouldValidate: true });
-    methods.handleSubmit(onSubmit)();
-  }
-
   return (
     <div className="relative flex min-h-screen border-black font-sans">
       <button
@@ -148,7 +142,6 @@ const KioskPage = () => {
             </div>
           </form>
         </FormProvider>
-        <button onClick={test}>test</button>
       </div>
 
       {/* Response Modal */}
