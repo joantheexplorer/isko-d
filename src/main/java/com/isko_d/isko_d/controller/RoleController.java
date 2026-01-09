@@ -1,17 +1,22 @@
 package com.isko_d.isko_d.controller;
 
 import com.isko_d.isko_d.dto.role.RoleRequestDTO;
+import com.isko_d.isko_d.dto.common.PaginatedResponse;
 import com.isko_d.isko_d.model.Role;
 import com.isko_d.isko_d.service.RoleService;
 import com.isko_d.isko_d.dto.role.RoleResponseDTO;
 import com.isko_d.isko_d.dto.role.RoleResponseDTO;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,14 +34,26 @@ public class RoleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RoleResponseDTO>> findAll() {
-        List<RoleResponseDTO> roles = roleService.findAll();
-
-        if (roles.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<PaginatedResponse<RoleResponseDTO>> findAll(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "15") int size,
+        @RequestParam(required = false) String searchBy,
+        @RequestParam(required = false) String search,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String sortDir,
+        @RequestParam(defaultValue = "false") boolean all
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") 
+            ? Sort.by(sortBy).ascending()
+            : Sort.by(sortBy).descending();
+        
+        if (all) {
+            List<RoleResponseDTO> roles = roleService.findAll(searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(roles));
+        } else {
+            Page<RoleResponseDTO> rolesPage = roleService.findPage(page, size, searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(rolesPage));
         }
-
-        return ResponseEntity.ok(roles);
     }
 
     @GetMapping(path="/{id}")

@@ -4,13 +4,18 @@ import com.isko_d.isko_d.model.Action;
 import com.isko_d.isko_d.service.ActionService;
 import com.isko_d.isko_d.dto.action.ActionResponseDTO;
 import com.isko_d.isko_d.dto.action.ActionRequestDTO;
+import com.isko_d.isko_d.dto.common.PaginatedResponse;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,14 +33,26 @@ public class ActionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ActionResponseDTO>> findAll() {
-        List<ActionResponseDTO> actions = actionService.findAll();
-
-        if (actions.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<PaginatedResponse<ActionResponseDTO>> findAll(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "15") int size,
+        @RequestParam(required = false) String searchBy,
+        @RequestParam(required = false) String search,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String sortDir,
+        @RequestParam(defaultValue = "false") boolean all
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") 
+            ? Sort.by(sortBy).ascending()
+            : Sort.by(sortBy).descending();
+        
+        if (all) {
+            List<ActionResponseDTO> actions = actionService.findAll(searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(actions));
+        } else {
+            Page<ActionResponseDTO> actionsPage = actionService.findPage(page, size, searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(actionsPage));
         }
-
-        return ResponseEntity.ok(actions);
     }
 
     @GetMapping(path="/{id}")

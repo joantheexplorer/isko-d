@@ -5,6 +5,10 @@ import com.isko_d.isko_d.dto.location.LocationRequestDTO;
 import com.isko_d.isko_d.dto.location.LocationResponseDTO;
 import com.isko_d.isko_d.repository.LocationRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -16,11 +20,50 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
-    public List<LocationResponseDTO> findAll() {
-        return locationRepository.findAll()
+    public List<LocationResponseDTO> findAll(
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return locationRepository
+                        .findByNameContaining(search, sort)
+                        .stream()
+                        .map(LocationResponseDTO::new)
+                        .toList();
+            }
+        }
+
+        return locationRepository
+            .findAll(sort)
             .stream()
-            .map((location) -> new LocationResponseDTO(location))
+            .map(LocationResponseDTO::new)
             .toList();
+    }
+
+    public Page<LocationResponseDTO> findPage(
+        int page,
+        int size,
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return locationRepository
+                        .findByNameContaining(search, pageRequest)
+                        .map(LocationResponseDTO::new);
+            }
+        }
+
+        return locationRepository
+            .findAll(pageRequest)
+            .map(LocationResponseDTO::new);
     }
 
     public LocationResponseDTO findById(Long id) {

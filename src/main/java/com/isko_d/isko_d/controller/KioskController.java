@@ -26,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 @RestController
-// @PreAuthorize("hasRole('DEVICE')")
 @RequestMapping(path="/kiosk")
 public class KioskController {
     private final LogService logService;

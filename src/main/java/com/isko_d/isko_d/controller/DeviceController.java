@@ -1,16 +1,21 @@
 package com.isko_d.isko_d.controller;
 
 import com.isko_d.isko_d.model.Device;
+import com.isko_d.isko_d.dto.common.PaginatedResponse;
 import com.isko_d.isko_d.service.DeviceService;
 import com.isko_d.isko_d.dto.device.DeviceRequestDTO;
 import com.isko_d.isko_d.dto.device.DeviceResponseDTO;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,14 +33,26 @@ public class DeviceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DeviceResponseDTO>> findAll() {
-        List<DeviceResponseDTO> devices = deviceService.findAll();
-
-        if (devices.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<PaginatedResponse<DeviceResponseDTO>> findAll(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "15") int size,
+        @RequestParam(required = false) String searchBy,
+        @RequestParam(required = false) String search,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String sortDir,
+        @RequestParam(defaultValue = "false") boolean all
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") 
+            ? Sort.by(sortBy).ascending()
+            : Sort.by(sortBy).descending();
+        
+        if (all) {
+            List<DeviceResponseDTO> devices = deviceService.findAll(searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(devices));
+        } else {
+            Page<DeviceResponseDTO> devicesPage = deviceService.findPage(page, size, searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(devicesPage));
         }
-
-        return ResponseEntity.ok(devices);
     }
 
     @GetMapping(path="/{id}")

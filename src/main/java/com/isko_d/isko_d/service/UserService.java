@@ -11,6 +11,9 @@ import com.isko_d.isko_d.repository.RoleRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
 import com.isko_d.isko_d.exception.UnauthorizedException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -32,11 +35,101 @@ public class UserService {
         this.tokenService = tokenService;
     }
 
-    public List<UserResponseDTO> findAll() {
-        return userRepository.findAll()
-                .stream()
-                .map((user) -> new UserResponseDTO(user))
-                .toList();
+    public List<UserResponseDTO> findAll(
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "firstName":
+                    return userRepository
+                        .findByFirstNameContaining(search, sort)
+						.stream()
+                        .map(UserResponseDTO::new)
+						.toList();
+                case "middleName":
+                    return userRepository
+                        .findByMiddleNameContaining(search, sort)
+						.stream()
+                        .map(UserResponseDTO::new)
+						.toList();
+                case "lastName":
+                    return userRepository
+                        .findByLastNameContaining(search, sort)
+						.stream()
+                        .map(UserResponseDTO::new)
+						.toList();
+                case "barcode":
+                    return userRepository
+                        .findByBarcodeContaining(search, sort)
+						.stream()
+                        .map(UserResponseDTO::new)
+						.toList();
+                case "email":
+                    return userRepository
+                        .findByEmailContaining(search, sort)
+						.stream()
+                        .map(UserResponseDTO::new)
+						.toList();
+                case "role":
+                    return userRepository
+                        .findByRoleNameContaining(search, sort)
+						.stream()
+                        .map(UserResponseDTO::new)
+						.toList();
+            }
+        }
+
+        return userRepository
+            .findAll(sort)
+            .stream()
+            .map(UserResponseDTO::new)
+            .toList();
+    }
+
+    public Page<UserResponseDTO> findPage(
+        int page,
+        int size,
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "firstName":
+                    return userRepository
+                        .findByFirstNameContaining(search, pageRequest)
+                        .map(UserResponseDTO::new);
+                case "middleName":
+                    return userRepository
+                        .findByMiddleNameContaining(search, pageRequest)
+                        .map(UserResponseDTO::new);
+                case "lastName":
+                    return userRepository
+                        .findByLastNameContaining(search, pageRequest)
+                        .map(UserResponseDTO::new);
+                case "barcode":
+                    return userRepository
+                        .findByBarcodeContaining(search, pageRequest)
+                        .map(UserResponseDTO::new);
+                case "email":
+                    return userRepository
+                        .findByEmailContaining(search, pageRequest)
+                        .map(UserResponseDTO::new);
+                case "role":
+                    return userRepository
+                        .findByRoleNameContaining(search, pageRequest)
+                        .map(UserResponseDTO::new);
+
+            }
+        }
+
+        return userRepository
+            .findAll(pageRequest)
+            .map(UserResponseDTO::new);
     }
 
     public UserResponseDTO findById(Long id) {

@@ -9,6 +9,9 @@ import com.isko_d.isko_d.exception.NotFoundException;
 import com.isko_d.isko_d.repository.DeviceRepository;
 import com.isko_d.isko_d.repository.LocationRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,11 +32,60 @@ public class DeviceService {
         this.tokenService = tokenService;
     }
 
-    public List<DeviceResponseDTO> findAll(){
-        return deviceRepository.findAll()
-        .stream()
-        .map((device)->new DeviceResponseDTO(device))
-        .toList();
+    public List<DeviceResponseDTO> findAll(
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return deviceRepository
+                        .findByNameContaining(search, sort)
+                        .stream()
+                        .map(DeviceResponseDTO::new)
+                        .toList();
+                case "department":
+                    return deviceRepository
+                        .findByLocationNameContaining(search, sort)
+                        .stream()
+                        .map(DeviceResponseDTO::new)
+                        .toList();
+            }
+        }
+
+        return deviceRepository
+            .findAll(sort)
+            .stream()
+            .map(DeviceResponseDTO::new)
+            .toList();
+    }
+
+    public Page<DeviceResponseDTO> findPage(
+        int page,
+        int size,
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return deviceRepository
+                        .findByNameContaining(search, pageRequest)
+                        .map(DeviceResponseDTO::new);
+                case "department":
+                    return deviceRepository
+                        .findByLocationNameContaining(search, pageRequest)
+                        .map(DeviceResponseDTO::new);
+            }
+        }
+
+        return deviceRepository
+            .findAll(pageRequest)
+            .map(DeviceResponseDTO::new);
     }
 
     public DeviceResponseDTO findById(Long id){

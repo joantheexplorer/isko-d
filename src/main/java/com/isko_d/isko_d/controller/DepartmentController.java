@@ -1,10 +1,14 @@
 package com.isko_d.isko_d.controller;
 
 import com.isko_d.isko_d.service.DepartmentService;
+import com.isko_d.isko_d.dto.common.PaginatedResponse;
 import com.isko_d.isko_d.dto.department.DepartmentRequestDTO;
 import com.isko_d.isko_d.dto.department.DepartmentResponseDTO;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -20,14 +24,26 @@ public class DepartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DepartmentResponseDTO>> findAll() {
-        List<DepartmentResponseDTO> departments = departmentService.findAll();
-
-        if (departments.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<PaginatedResponse<DepartmentResponseDTO>> findAll(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "15") int size,
+        @RequestParam(required = false) String searchBy,
+        @RequestParam(required = false) String search,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String sortDir,
+        @RequestParam(defaultValue = "false") boolean all
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") 
+            ? Sort.by(sortBy).ascending()
+            : Sort.by(sortBy).descending();
+        
+        if (all) {
+            List<DepartmentResponseDTO> departments = departmentService.findAll(searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(departments));
+        } else {
+            Page<DepartmentResponseDTO> departmentsPage = departmentService.findPage(page, size, searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(departmentsPage));
         }
-
-        return ResponseEntity.ok(departments);
     }
 
     @GetMapping(path="/{id}")

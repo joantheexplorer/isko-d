@@ -7,6 +7,10 @@ import com.isko_d.isko_d.dto.program.ProgramResponseDTO;
 import com.isko_d.isko_d.repository.ProgramRepository;
 import com.isko_d.isko_d.repository.DepartmentRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -20,11 +24,60 @@ public class ProgramService {
         this.departmentRepository = departmentRepository;
     }
 
-    public List<ProgramResponseDTO> findAll() {
-        return programRepository.findAll()
+    public List<ProgramResponseDTO> findAll(
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return programRepository
+                        .findByNameContaining(search, sort)
+                        .stream()
+                        .map(ProgramResponseDTO::new)
+                        .toList();
+                case "department":
+                    return programRepository
+                        .findByDepartmentNameContaining(search, sort)
+                        .stream()
+                        .map(ProgramResponseDTO::new)
+                        .toList();
+            }
+        }
+
+        return programRepository
+            .findAll(sort)
             .stream()
             .map(ProgramResponseDTO::new)
             .toList();
+    }
+
+    public Page<ProgramResponseDTO> findPage(
+        int page,
+        int size,
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return programRepository
+                        .findByNameContaining(search, pageRequest)
+                        .map(ProgramResponseDTO::new);
+                case "department":
+                    return programRepository
+                        .findByDepartmentNameContaining(search, pageRequest)
+                        .map(ProgramResponseDTO::new);
+            }
+        }
+
+        return programRepository
+            .findAll(pageRequest)
+            .map(ProgramResponseDTO::new);
     }
 
     public ProgramResponseDTO findById(Long id) {

@@ -5,6 +5,10 @@ import com.isko_d.isko_d.dto.department.DepartmentRequestDTO;
 import com.isko_d.isko_d.dto.department.DepartmentResponseDTO;
 import com.isko_d.isko_d.repository.DepartmentRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -16,11 +20,50 @@ public class DepartmentService {
         this.departmentRepository = departmentRepository;
     }
 
-    public List<DepartmentResponseDTO> findAll() {
-        return departmentRepository.findAll()
+    public List<DepartmentResponseDTO> findAll(
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return departmentRepository
+                        .findByNameContaining(search, sort)
+                        .stream()
+                        .map(DepartmentResponseDTO::new)
+                        .toList();
+            }
+        }
+
+        return departmentRepository
+            .findAll(sort)
             .stream()
             .map(DepartmentResponseDTO::new)
             .toList();
+    }
+
+    public Page<DepartmentResponseDTO> findPage(
+        int page,
+        int size,
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return departmentRepository
+                        .findByNameContaining(search, pageRequest)
+                        .map(DepartmentResponseDTO::new);
+            }
+        }
+
+        return departmentRepository
+            .findAll(pageRequest)
+            .map(DepartmentResponseDTO::new);
     }
 
     public DepartmentResponseDTO findById(Long id) {

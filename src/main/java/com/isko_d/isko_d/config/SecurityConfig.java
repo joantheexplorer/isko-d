@@ -18,7 +18,7 @@ import com.isko_d.isko_d.security.BearerTokenAuthFilter;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class SecurityConfig {
     private final BearerTokenAuthFilter bearerTokenAuthFilter;
 
@@ -34,7 +34,8 @@ public class SecurityConfig {
             .cors(cors -> {})
             .authorizeHttpRequests(request -> {
                 request.requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout").permitAll();
-                request.anyRequest().authenticated();
+                request.requestMatchers("/api/actions/**", "/api/kiosk/**").authenticated();
+                request.anyRequest().hasAnyRole("SUPERADMIN", "ADMIN");
             })
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

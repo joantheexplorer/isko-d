@@ -11,6 +11,10 @@ import com.isko_d.isko_d.repository.DeviceRepository;
 import com.isko_d.isko_d.repository.LogRepository;
 import com.isko_d.isko_d.repository.UserRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -33,12 +37,82 @@ public class LogService {
         this.userRepository = userRepository;
     }
 
-    public List<LogResponseDTO> findAll() {
-        return logRepository.findAll()
+    public List<LogResponseDTO> findAll(
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "barcode":
+                    return logRepository
+                        .findByUserBarcodeContaining(search, sort)
+                        .stream()
+                        .map(LogResponseDTO::new)
+                        .toList();
+                case "action":
+                    return logRepository
+                        .findByActionNameContaining(search, sort)
+                        .stream()
+                        .map(LogResponseDTO::new)
+                        .toList();
+                case "location":
+                    return logRepository
+                        .findByDeviceLocationNameContaining(search, sort)
+                        .stream()
+                        .map(LogResponseDTO::new)
+                        .toList();
+                case "device":
+                    return logRepository
+                        .findByDeviceNameContaining(search, sort)
+                        .stream()
+                        .map(LogResponseDTO::new)
+                        .toList();
+            }
+        }
+
+        return logRepository
+            .findAll(sort)
             .stream()
-            .map((log) -> new LogResponseDTO(log))
+            .map(LogResponseDTO::new)
             .toList();
     }
+
+    public Page<LogResponseDTO> findPage(
+        int page,
+        int size,
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "barcode":
+                    return logRepository
+                        .findByUserBarcodeContaining(search, pageRequest)
+                        .map(LogResponseDTO::new);
+                case "action":
+                    return logRepository
+                        .findByActionNameContaining(search, pageRequest)
+                        .map(LogResponseDTO::new);
+                case "location":
+                    return logRepository
+                        .findByDeviceLocationNameContaining(search, pageRequest)
+                        .map(LogResponseDTO::new);
+                case "device":
+                    return logRepository
+                        .findByDeviceNameContaining(search, pageRequest)
+                        .map(LogResponseDTO::new);
+            }
+        }
+
+        return logRepository
+            .findAll(pageRequest)
+            .map(LogResponseDTO::new);
+    }
+
 
     public LogResponseDTO findById(Long id) {
         return logRepository.findById(id)

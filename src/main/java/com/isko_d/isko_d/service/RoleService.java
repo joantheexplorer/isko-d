@@ -7,6 +7,10 @@ import com.isko_d.isko_d.dto.role.RoleResponseDTO;
 import com.isko_d.isko_d.repository.RoleRepository;
 import com.isko_d.isko_d.repository.UserRepository;
 import com.isko_d.isko_d.exception.NotFoundException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +25,50 @@ public class RoleService {
         this.userRepository = userRepository;
     }
 
-    public List<RoleResponseDTO> findAll() {
-        return roleRepository.findAll()
-                .stream()
-                .map((role) -> new RoleResponseDTO(role))
-                .toList();
+    public List<RoleResponseDTO> findAll(
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return roleRepository
+                        .findByNameContaining(search, sort)
+                        .stream()
+                        .map(RoleResponseDTO::new)
+                        .toList();
+            }
+        }
+
+        return roleRepository
+            .findAll(sort)
+            .stream()
+            .map(RoleResponseDTO::new)
+            .toList();
+    }
+
+    public Page<RoleResponseDTO> findPage(
+        int page,
+        int size,
+        String searchBy,
+        String search,
+        Sort sort
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (searchBy != null && search != null) {
+            switch (searchBy.toLowerCase()) {
+                case "name":
+                    return roleRepository
+                        .findByNameContaining(search, pageRequest)
+                        .map(RoleResponseDTO::new);
+            }
+        }
+
+        return roleRepository
+            .findAll(pageRequest)
+            .map(RoleResponseDTO::new);
     }
 
     public RoleResponseDTO findById(Long id) {

@@ -2,15 +2,20 @@ package com.isko_d.isko_d.controller;
 
 import com.isko_d.isko_d.model.Log;
 import com.isko_d.isko_d.service.LogService;
+import com.isko_d.isko_d.dto.common.PaginatedResponse;
 import com.isko_d.isko_d.dto.log.LogRequestDTO;
 import com.isko_d.isko_d.dto.log.LogResponseDTO;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,19 +33,26 @@ public class LogController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LogResponseDTO>> findAll() {
-        List<LogResponseDTO> logs = logService.findAll();
-
-        if (logs.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<PaginatedResponse<LogResponseDTO>> findAll(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "15") int size,
+        @RequestParam(required = false) String searchBy,
+        @RequestParam(required = false) String search,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String sortDir,
+        @RequestParam(defaultValue = "false") boolean all
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") 
+            ? Sort.by(sortBy).ascending()
+            : Sort.by(sortBy).descending();
+        
+        if (all) {
+            List<LogResponseDTO> logs = logService.findAll(searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(logs));
+        } else {
+            Page<LogResponseDTO> logsPage = logService.findPage(page, size, searchBy, search, sort);
+            return ResponseEntity.ok(new PaginatedResponse<>(logsPage));
         }
-
-        return ResponseEntity.ok(logs);
-    }
-
-    @GetMapping(path="/{id}")
-    public ResponseEntity<LogResponseDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(logService.findById(id));
     }
 
     @PostMapping
