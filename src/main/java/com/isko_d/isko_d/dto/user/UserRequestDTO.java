@@ -3,6 +3,7 @@ package com.isko_d.isko_d.dto.user;
 import com.isko_d.isko_d.validation.Create;
 import com.isko_d.isko_d.validation.Update;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Email;
 
 public class UserRequestDTO {
@@ -24,7 +25,7 @@ public class UserRequestDTO {
     @NotBlank(groups=Create.class)
     private String password;
 
-    @NotBlank(groups=Create.class)
+    @NotNull(groups=Create.class)
     private Long roleId;
 
     public String getBarcode() { return barcode; }
