@@ -45,7 +45,7 @@ public class DeviceService {
                         .stream()
                         .map(DeviceResponseDTO::new)
                         .toList();
-                case "department":
+                case "location":
                     return deviceRepository
                         .findByLocationNameContaining(search, sort)
                         .stream()
@@ -76,7 +76,7 @@ public class DeviceService {
                     return deviceRepository
                         .findByNameContaining(search, pageRequest)
                         .map(DeviceResponseDTO::new);
-                case "department":
+                case "location":
                     return deviceRepository
                         .findByLocationNameContaining(search, pageRequest)
                         .map(DeviceResponseDTO::new);

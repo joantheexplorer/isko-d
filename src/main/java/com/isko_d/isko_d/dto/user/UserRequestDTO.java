@@ -24,6 +24,7 @@ public class UserRequestDTO {
     @NotBlank(groups=Create.class)
     private String password;
 
+    @NotBlank(groups=Create.class)
     private Long roleId;
 
     public String getBarcode() { return barcode; }
